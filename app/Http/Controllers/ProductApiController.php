@@ -22,7 +22,7 @@ class ProductApiController extends Controller
         $attribute_meta_data = json_decode($attribute_meta, true);
 
         $page = $request->query('page') ? : 1;
-        $page_size = $request->query('page_size') ? : sizeof($products_data);
+        $page_size = $request->query('page_size') ? : count($products_data);
 
         //sort the products based on name ASC
         usort($products_data, function($a, $b){ return strcmp( $a['name'], $b['name'] ); });
@@ -31,7 +31,7 @@ class ProductApiController extends Controller
         for( $i = 0; $i < $page_size; $i++){
             $index = ($page - 1) * $page_size;
 
-            if($i + $index < sizeof($products_data)){
+            if($i + $index < count($products_data)){
                 $page_data[] = $products_data[$i + $index];
             }
         }
@@ -41,7 +41,11 @@ class ProductApiController extends Controller
             $product['attributes'] = $this->remapProductAttributes($product['attributes'], $attribute_meta_data);
         }
 
-        return response()->json(['products' => $page_data, 'page' => $page, 'totalPages'=> ceil(sizeof($products_data) / $page_size)], 200);
+        return response()->json([
+            'products' => $page_data, 
+            'page' => $page, 
+            'totalPages'=> ceil(count($products_data) / $page_size)
+        ], 200);
     }
 
     /**
@@ -73,7 +77,7 @@ class ProductApiController extends Controller
                         $newValue = '';
                         $cat_lookup = 'cat_';
 
-                        for($i = 1; $i < sizeof($cat); $i++){
+                        for($i = 1; $i < count($cat); $i++){
                             $cat_lookup = $cat_lookup . $cat[$i];
 
                             foreach($attribute['values'] as $newValues){
@@ -82,7 +86,7 @@ class ProductApiController extends Controller
                                 }
                             }
 
-                            if($i+1 < sizeof($cat)) {
+                            if($i+1 < count($cat)) {
                                 $newValue = $newValue . ' > ';
                                 $cat_lookup = $cat_lookup . '_';
                             }
